@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<script type="text/javascript" src="./index.js"></script>
+	<meta charset="UTF-8">
+	<title>Carrots or Garbage</title>
+</head>
+<body>
+	<h1>Carrots or Garbage</h1>
+	<h2>Score: <span class="score">0</span></h2>
+	<p>Total Plays: <span class="total-plays">0</span> | Play Credits: <span class="play-credits">0</span></p>
+	<p>Pick one:</p>
+	<div>
+		<button onclick="choose('carrots')">Carrots</button> OR <button onclick="choose('garbage')">Garbage</button>
+	</div>
+	<div class="results">
+		<h2>Results</h2>
+		<p>You guessed: <span class="guess"></span></p>
+		<p>Results: <span class="result"></span></p>
+		<p class="win-lose"></p>
+	</div>
+</body>
+</html>

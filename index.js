@@ -40,9 +40,11 @@ function choose (guess) {
 	game.modAttr("playCredits",1);
 	game.addPlay();
 	checkFlags.forEach((flag) => {
+		console.log(flag.flagName + " checked")
 		let tripped = flag.checkMe();
 		if (tripped) {
 			trippedFlags.push(flag.flagName);
+			checkFlags.splice(checkFlags.indexOf(flag),1);
 		}
 	})
 	updateDisplay(choice, result);

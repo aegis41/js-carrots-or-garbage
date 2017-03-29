@@ -40,10 +40,9 @@ function choose (guess) {
 	game.modAttr("playCredits",1);
 	game.addPlay();
 	checkFlags.forEach((flag) => {
-		console.log(flag.flagName + " checked")
 		let tripped = flag.checkMe();
 		if (tripped) {
-			trippedFlags.push(flag.flagName);
+			trippedFlags.push(flag);
 			checkFlags.splice(checkFlags.indexOf(flag),1);
 		}
 	})
@@ -90,7 +89,7 @@ function updateDisplay (guess, result) {
 	if(trippedFlags && trippedFlags.length > 0) {
 		trippedFlags.forEach((flag => {
 			let listItem = document.createElement("li");
-			listItem.appendChild(document.createTextNode(flag));
+			listItem.appendChild(document.createTextNode(flag.flagName));
 			flagList.appendChild(listItem);
 		}))
 	}

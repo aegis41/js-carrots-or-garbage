@@ -81,6 +81,10 @@ function updateDisplay (guess, result) {
 		game.modAttr("score",-1);
 	}
 
+	while (flagList.firstChild) {
+		flagList.removeChild(flagList.firstChild);
+	}
+
 	if(trippedFlags && trippedFlags.length > 0) {
 		trippedFlags.forEach((flag => {
 			let listItem = document.createElement("li");

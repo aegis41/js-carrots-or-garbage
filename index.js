@@ -39,6 +39,12 @@ function choose (guess) {
 	let result = getCarrotOrGarbage();
 	game.modAttr("playCredits",1);
 	game.addPlay();
+	checkFlags.forEach((flag) => {
+		let tripped = flag.checkMe();
+		if (tripped) {
+			trippedFlags.push(flag.flagName);
+		}
+	})
 	updateDisplay(choice, result);
 }
 
@@ -64,12 +70,23 @@ function updateDisplay (guess, result) {
 	const [scoreDisplay] = document.getElementsByClassName("score");
 	const [totalPlays] = document.getElementsByClassName("total-plays");
 	const [playCredits] = document.getElementsByClassName("play-credits");
+	const [flagDisplay] = document.getElementsByClassName("flag-display");
+	const [flagList] = document.getElementsByClassName("flag-list");
 	let winText = "YOU LOSE!";
+
 	if(didWin(guess, result)) {
 		winText = "WINNER!";
 		game.modAttr("score",1);
 	} else {
 		game.modAttr("score",-1);
+	}
+
+	if(trippedFlags && trippedFlags.length > 0) {
+		trippedFlags.forEach((flag => {
+			let listItem = document.createElement("li");
+			listItem.appendChild(document.createTextNode(flag));
+			flagList.appendChild(listItem);
+		}))
 	}
 
 	choiceDisplay.innerHTML = capitalizeFirstLetter(guess);

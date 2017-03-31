@@ -1,3 +1,4 @@
+// object keeping track of score, total plays, and play credits
 const game = {
 	score: 0,
 	totalPlays: 0,
@@ -15,6 +16,7 @@ const game = {
 	}
 };
 
+// list of the flags that may be passed in gameplay
 const flagList = [
 	{
 		"flagName": "Novice Better",
@@ -30,40 +32,40 @@ const flagList = [
 	}
 ];
 
-const checkFlags = buildFlags(flagList);
+// array of the flags that need to be checked each play cycle
+const flagsToCheck = buildFlags(flagList);
+//array of the flags that have already been tripped (reached achievements)
 const trippedFlags = [];
 
-
+// this function takes a carrots or garbage guess, updates some game properties, checks to see if flags are tripped, and updates the display
 function choose (guess) {
 	let choice = guess || "carrots";
 	let result = getCarrotOrGarbage();
 	game.modAttr("playCredits",1);
 	game.addPlay();
-	checkFlags.forEach((flag) => {
-		let tripped = flag.checkMe();
-		if (tripped) {
-			trippedFlags.push(flag);
-			checkFlags.splice(checkFlags.indexOf(flag),1);
-		}
-	})
+	checkFlags();
 	updateDisplay(choice, result);
 }
 
+// this function capitalizes the first letter of a string
 function capitalizeFirstLetter (string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+// this function generates a random integer, inclusively, between an upper and lower range
 function getRandomInt (upper, lower) {
 	const min = Math.ceil(lower || 0);
 	const max = Math.floor(upper || 1);
 	return Math.floor(Math.random() * (max + 1 - min) + min);
 }
 
+// this function returns a string of carrots or garbage
 function getCarrotOrGarbage () {
 	let rand = getRandomInt(2,1);
 	return rand > 1 ? "garbage" : "carrots";
 }
 
+// this function updates the display after a game play cycle
 function updateDisplay (guess, result) {
 	const [choiceDisplay] = document.getElementsByClassName("guess");
 	const [resultsDisplay] = document.getElementsByClassName("result");
@@ -82,9 +84,7 @@ function updateDisplay (guess, result) {
 		game.modAttr("score",-1);
 	}
 
-	while (flagList.firstChild) {
-		flagList.removeChild(flagList.firstChild);
-	}
+	clearList(flagList);
 
 	if(trippedFlags && trippedFlags.length > 0) {
 		trippedFlags.forEach((flag => {
@@ -103,10 +103,12 @@ function updateDisplay (guess, result) {
 
 }
 
+// this function returns true if the guess matched the result
 function didWin (guess, result) {
 	return guess === result;
 }
 
+// this function constructs a Flag object
 function Flag (flagName, attr, condition, condValue) {
 	this.flagName = flagName;
 	this.attr = attr;
@@ -125,9 +127,28 @@ function Flag (flagName, attr, condition, condValue) {
 	}
 }
 
+// this function iterates the array of flags and instantiates each, returning an array of the flag objects
 function buildFlags (flagList) {
 	const flagArray = flagList.map((flag)=> {
 		return new Flag (flag.flagName, flag.attr, flag.condition, flag.condValue);
 	});
 	return flagArray;
+}
+
+// this function removes all of the list items from a list
+function clearList (list) {
+	while (list.firstChild) {
+		list.removeChild(list.firstChild);
+	}
+}
+
+// this function checks the flags
+function checkFlags () {
+	flagsToCheck.forEach((flag) => {
+		let tripped = flag.checkMe();
+		if (tripped) {
+			trippedFlags.push(flag);
+			flagsToCheck.splice(flagsToCheck.indexOf(flag),1);
+		}
+	});
 }

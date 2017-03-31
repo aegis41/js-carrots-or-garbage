@@ -3,6 +3,9 @@ const game = {
 	score: 0,
 	totalPlays: 0,
 	playCredits: 0,
+	activeExtras: [],
+	choice: "",
+	result: "",
 	modAttr: function (attr, amount, relative) {
 		relative = relative || true;
 		if (relative) {
@@ -22,13 +25,21 @@ const flagList = [
 		"flagName": "Novice Better",
 		"attr": "totalPlays",
 		"condition": "===",
-		"condValue": "10"
+		"condValue": "5",
+		"extra": {
+			"extraName": "Double Down",
+			"extraFunc": "doubleDown"
+		}
 	},
 	{
 		"flagName": "Experienced Better",
 		"attr": "totalPlays",
 		"condition": "===",
-		"condValue": "100"
+		"condValue": "10",
+		"extra" : {
+			"extraName": "Better Chance",
+			"extraFunc": "betterChance"
+		}
 	}
 ];
 
@@ -39,12 +50,12 @@ const trippedFlags = [];
 
 // this function takes a carrots or garbage guess, updates some game properties, checks to see if flags are tripped, and updates the display
 function choose (guess) {
-	let choice = guess || "carrots";
-	let result = getCarrotOrGarbage();
+	game.choice = guess || "carrots";
+	game.result = getCarrotOrGarbage();
 	game.modAttr("playCredits",1);
 	game.addPlay();
 	checkFlags();
-	updateDisplay(choice, result);
+	updateDisplay();
 }
 
 // this function capitalizes the first letter of a string
@@ -66,7 +77,7 @@ function getCarrotOrGarbage () {
 }
 
 // this function updates the display after a game play cycle
-function updateDisplay (guess, result) {
+function updateDisplay () {
 	const [choiceDisplay] = document.getElementsByClassName("guess");
 	const [resultsDisplay] = document.getElementsByClassName("result");
 	const [winDisplay] = document.getElementsByClassName("win-lose");
@@ -75,27 +86,32 @@ function updateDisplay (guess, result) {
 	const [playCredits] = document.getElementsByClassName("play-credits");
 	const [flagDisplay] = document.getElementsByClassName("flag-display");
 	const [flagList] = document.getElementsByClassName("flag-list");
+	const [extras] = document.getElementsByClassName("extras");
+	const [activeExtras] = document.getElementsByClassName("active-extras");
+
 	let winText = "YOU LOSE!";
 
-	if(didWin(guess, result)) {
+	if(didWin(game.choice, game.result)) {
 		winText = "WINNER!";
 		game.modAttr("score",1);
 	} else {
 		game.modAttr("score",-1);
 	}
 
-	clearList(flagList);
-
-	if(trippedFlags && trippedFlags.length > 0) {
-		trippedFlags.forEach((flag => {
-			let listItem = document.createElement("li");
-			listItem.appendChild(document.createTextNode(flag.flagName));
-			flagList.appendChild(listItem);
-		}))
+	if (game.activeExtras && game.activeExtras.length > 0) {
+		game.activeExtras.forEach((extra) => {
+			let textNode = document.createTextNode(extra);
+			activeExtras.appendChild(textNode);
+		})
 	}
 
-	choiceDisplay.innerHTML = capitalizeFirstLetter(guess);
-	resultsDisplay.innerHTML = capitalizeFirstLetter(result);
+	clearElement(flagList);
+	clearElement(extras);
+	displayTrippedFlags(flagList);
+	displayExtrasButtons(extras);
+
+	choiceDisplay.innerHTML = capitalizeFirstLetter(game.choice);
+	resultsDisplay.innerHTML = capitalizeFirstLetter(game.result);
 	winDisplay.innerHTML = winText;
 	scoreDisplay.innerHTML = game.score;
 	totalPlays.innerHTML = game.totalPlays;
@@ -109,11 +125,12 @@ function didWin (guess, result) {
 }
 
 // this function constructs a Flag object
-function Flag (flagName, attr, condition, condValue) {
+function Flag (flagName, attr, condition, condValue, extra) {
 	this.flagName = flagName;
 	this.attr = attr;
 	this.condition = condition;
 	this.condValue = parseInt(condValue);
+	this.extra = extra
 	this.checkMe = function () {
 		if (condition === "===") {
 			return game[attr] === this.condValue;
@@ -130,15 +147,15 @@ function Flag (flagName, attr, condition, condValue) {
 // this function iterates the array of flags and instantiates each, returning an array of the flag objects
 function buildFlags (flagList) {
 	const flagArray = flagList.map((flag)=> {
-		return new Flag (flag.flagName, flag.attr, flag.condition, flag.condValue);
+		return new Flag (flag.flagName, flag.attr, flag.condition, flag.condValue, flag.extra);
 	});
 	return flagArray;
 }
 
 // this function removes all of the list items from a list
-function clearList (list) {
-	while (list.firstChild) {
-		list.removeChild(list.firstChild);
+function clearElement (element) {
+	while (element.firstChild) {
+		element.removeChild(element.firstChild);
 	}
 }
 
@@ -151,4 +168,37 @@ function checkFlags () {
 			flagsToCheck.splice(flagsToCheck.indexOf(flag),1);
 		}
 	});
+}
+
+function displayTrippedFlags (trippedList) {
+	if(trippedFlags && trippedFlags.length > 0) {
+		trippedFlags.forEach((flag => {
+			let listItem = document.createElement("li");
+			listItem.appendChild(document.createTextNode(flag.flagName));
+			trippedList.appendChild(listItem);
+		})
+	)}
+}
+
+function displayExtrasButtons (extrasElement) {
+	if(trippedFlags && trippedFlags.length > 0) {
+		trippedFlags.forEach((flag => {
+			let extraButton = document.createElement("button");
+			with (extraButton) {
+				appendChild(document.createTextNode(flag.extra.extraName));
+				type = "button";
+				addEventListener("click", function () {toggleActiveExtra(flag.extra.extraName)}, false);
+			}
+			extrasElement.appendChild(extraButton);
+		})
+	)}
+}
+
+function toggleActiveExtra(extra) {
+	if(game.activeExtras.indexOf(extra) === -1) {
+		game.activeExtras.push(extra);
+	} else {
+		game.activeExtras.splice(game.activeExtras.indexOf(extra),1);
+	}
+	updateDisplay();
 }

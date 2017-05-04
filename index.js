@@ -22,9 +22,7 @@ if (storageAvailable('localStorage')) {
 
 
 // object keeping track of score, total plays, and play credits
-if (myStorage.getItem('game')) {
-	console.log(myStorage.getItem('game'));
-}
+
 const game = {
 	score: 0,
 	totalPlays: 0,
@@ -44,6 +42,7 @@ const game = {
 		++this.totalPlays;
 	}
 };
+
 
 // list of the flags that may be passed in gameplay
 const flagList = [
@@ -73,6 +72,12 @@ const flagList = [
 const flagsToCheck = buildFlags(flagList);
 //array of the flags that have already been tripped (reached achievements)
 const trippedFlags = [];
+
+// load in from local storage if there is one
+if (myStorage.length) {
+	readLocalStorage();
+	updateDisplay();
+}
 
 // this function takes a carrots or garbage guess, updates some game properties, checks to see if flags are tripped, and updates the display
 function choose (guess) {
@@ -106,8 +111,22 @@ function getCarrotOrGarbage () {
 // this function updates the local storage after a game play cycle
 function updateLocalStorage() {
 	if(canStore) {
-		myStorage.setItem("game", game);
+		myStorage.setItem("score", game.score);
+		myStorage.setItem("totalPlays", game.totalPlays);
+		myStorage.setItem("playCredits", game.playCredits);
+		myStorage.setItem("activeExtras", game.activeExtras);
+		myStorage.setItem("choice", game.choice);
+		myStorage.setItem("result", game.result);
 	}
+}
+
+function readLocalStorage() {
+	game.score = parseInt(myStorage.getItem("score"));
+	game.totalPlays = parseInt(myStorage.getItem("totalPlays"));
+	game.playCredits = parseInt(myStorage.getItem("playCredits"));
+	game.activeExtras = myStorage.getItem("activeExtras");
+	game.choice = myStorage.getItem("choice");
+	game.result = myStorage.getItem("result");
 }
 
 // this function updates the display after a game play cycle
@@ -143,7 +162,6 @@ function updateDisplay () {
 	clearElement(extras);
 	displayTrippedFlags(flagList);
 	displayExtrasButtons(extras);
-
 	choiceDisplay.innerHTML = capitalizeFirstLetter(game.choice);
 	resultsDisplay.innerHTML = capitalizeFirstLetter(game.result);
 	winDisplay.innerHTML = winText;
@@ -188,8 +206,10 @@ function buildFlags (flagList) {
 
 // this function removes all of the list items from a list
 function clearElement (element) {
-	while (element.firstChild) {
-		element.removeChild(element.firstChild);
+	if (element) {
+		while (element.firstChild) {
+			element.removeChild(element.firstChild);
+		}
 	}
 }
 

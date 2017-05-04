@@ -1,4 +1,30 @@
+// set up local storage
+function storageAvailable(type) {
+	try {
+		let storage = window[type],
+			x = '__storage_test__';
+		storage.setItem(x, x);
+		storage.removeItem(x);
+		return true;
+	}
+	catch (e) {
+		return false;
+	}
+}
+
+let myStorage = {};
+let canStore = false;
+
+if (storageAvailable('localStorage')) {
+	myStorage = localStorage;
+	canStore = true;
+}
+
+
 // object keeping track of score, total plays, and play credits
+if (myStorage.getItem('game')) {
+	console.log(myStorage.getItem('game'));
+}
 const game = {
 	score: 0,
 	totalPlays: 0,
@@ -55,6 +81,7 @@ function choose (guess) {
 	game.modAttr("playCredits",1);
 	game.addPlay();
 	checkFlags();
+	updateLocalStorage();
 	updateDisplay();
 }
 
@@ -74,6 +101,13 @@ function getRandomInt (upper, lower) {
 function getCarrotOrGarbage () {
 	let rand = getRandomInt(2,1);
 	return rand > 1 ? "garbage" : "carrots";
+}
+
+// this function updates the local storage after a game play cycle
+function updateLocalStorage() {
+	if(canStore) {
+		myStorage.setItem("game", game);
+	}
 }
 
 // this function updates the display after a game play cycle

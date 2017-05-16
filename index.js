@@ -30,6 +30,8 @@ const game = {
 	activeExtras: [],
 	choice: "",
 	result: "",
+	didWin: false,
+	winText: "",
 	modAttr: function (attr, amount, relative) {
 		relative = relative || true;
 		if (relative) {
@@ -74,9 +76,11 @@ const flagsToCheck = buildFlags(flagList);
 const trippedFlags = [];
 
 // load in from local storage if there is one
-if (myStorage.length) {
-	readLocalStorage();
-	updateDisplay();
+window.onload = function () {
+	if (myStorage.length) {
+		readLocalStorage();
+		updateDisplay();
+	}
 }
 
 // this function takes a carrots or garbage guess, updates some game properties, checks to see if flags are tripped, and updates the display
@@ -84,6 +88,12 @@ function choose (guess) {
 	game.choice = guess || "carrots";
 	game.result = getCarrotOrGarbage();
 	game.modAttr("playCredits",1);
+	game.didWin = (didWin(game.choice, game.result));
+	if (game.didWin) {
+		game.winText = "You Won!!!";
+	} else {
+		game.winText = "Aww. You lost.";
+	}
 	game.addPlay();
 	checkFlags();
 	updateLocalStorage();
@@ -129,6 +139,11 @@ function readLocalStorage() {
 	game.result = myStorage.getItem("result");
 }
 
+function clearLocalStorage() {
+	myStorage.clear();
+	window.location.reload(true);
+}
+
 // this function updates the display after a game play cycle
 function updateDisplay () {
 	const [choiceDisplay] = document.getElementsByClassName("guess");
@@ -141,15 +156,6 @@ function updateDisplay () {
 	const [flagList] = document.getElementsByClassName("flag-list");
 	const [extras] = document.getElementsByClassName("extras");
 	const [activeExtras] = document.getElementsByClassName("active-extras");
-
-	let winText = "YOU LOSE!";
-
-	if(didWin(game.choice, game.result)) {
-		winText = "WINNER!";
-		game.modAttr("score",1);
-	} else {
-		game.modAttr("score",-1);
-	}
 
 	if (game.activeExtras && game.activeExtras.length > 0) {
 		game.activeExtras.forEach((extra) => {
@@ -164,7 +170,7 @@ function updateDisplay () {
 	displayExtrasButtons(extras);
 	choiceDisplay.innerHTML = capitalizeFirstLetter(game.choice);
 	resultsDisplay.innerHTML = capitalizeFirstLetter(game.result);
-	winDisplay.innerHTML = winText;
+	winDisplay.innerHTML = game.winText;
 	scoreDisplay.innerHTML = game.score;
 	totalPlays.innerHTML = game.totalPlays;
 	playCredits.innerHTML = game.playCredits;

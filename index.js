@@ -20,16 +20,23 @@ if (storageAvailable('localStorage')) {
 	canStore = true;
 }
 
-
 // object keeping track of score, total plays, and play credits
 
 const game = {
+	curGame: "guess",
+	betOptions: {
+		guess: [1, 5, 10, 25, 50],
+		haul: [50, 100, 250, 500, 750],
+		match: [750, 1000, 1500, 2500, 5000]
+	},
+	betAmount: 1,
 	score: 0,
 	totalPlays: 0,
 	playCredits: 0,
 	activeExtras: [],
 	choice: "",
 	result: "",
+	lastDidWin: false,
 	modAttr: function (attr, amount, relative) {
 		relative = relative || true;
 		if (relative) {
@@ -40,8 +47,134 @@ const game = {
 	},
 	addPlay: function () {
 		++this.totalPlays;
+	},
+	get: function(attr) {
+		return game[attr];
+	},
+	set: function(attr, value) {
+		game[attr] = value;
 	}
 };
+
+// this function takes a carrots or garbage guess, updates some game properties, checks to see if flags are tripped, and updates the display
+function choose (guess) {
+	game.choice = guess || "carrots";
+	game.result = getCarrotOrGarbage();
+	game.modAttr("playCredits",1);
+	game.addPlay();
+	game.lastDidWin = didWin(game.choice, game.result);
+	game.lastDidWin ? game.modAttr("score", 1) : game.modAttr("score", -1);
+	//checkFlags();
+	//updateLocalStorage();
+	updateDisplay();
+}
+
+// this function generates a random integer, inclusively, between an upper and lower range
+function getRandomInt (upper, lower) {
+	const min = Math.ceil(lower || 0);
+	const max = Math.floor(upper || 1);
+	return Math.floor(Math.random() * (max + 1 - min) + min);
+}
+
+// this function returns a string of carrots or garbage
+function getCarrotOrGarbage () {
+	let rand = getRandomInt(2,1);
+	return rand > 1 ? "garbage" : "carrots";
+}
+
+// this function returns true if the guess matched the result
+function didWin (guess, result) {
+	return guess === result;
+}
+
+// this function updates the display after a game play cycle
+function updateDisplay () {
+	const [choiceDisplay] = document.getElementsByClassName("guess");
+	const [resultsDisplay] = document.getElementsByClassName("result");
+	const [winDisplay] = document.getElementsByClassName("win-lose");
+	const [scoreDisplay] = document.getElementsByClassName("score");
+	const [totalPlays] = document.getElementsByClassName("total-plays");
+	const [playCredits] = document.getElementsByClassName("play-credits");
+	const [betButtons] = document.getElementsByClassName("bet-buttons");
+	const [currentBet] = document.getElementsByClassName("current-bet");
+	const [flagDisplay] = document.getElementsByClassName("flag-display");
+	const [flagList] = document.getElementsByClassName("flag-list");
+	const [extras] = document.getElementsByClassName("extras");
+	const [activeExtras] = document.getElementsByClassName("active-extras");
+
+	let winText = game.lastDidWin ? "WINNER!" : "You Lose!!";
+
+	// if (game.activeExtras && game.activeExtras.length > 0) {
+	// 	game.activeExtras.forEach((extra) => {
+	// 		let textNode = document.createTextNode(extra);
+	// 		activeExtras.appendChild(textNode);
+	// 	})
+	// }
+
+	clearElement(flagList);
+	clearElement(extras);
+	for (let i = 0; i < betButtons.cells.length; i++) {
+		clearElement(betButtons.cells[i]);
+	}
+	clearElement(currentBet);
+	displayBetButtons(makeBetButtons(), betButtons);
+	//displayTrippedFlags(flagList);
+	//displayExtrasButtons(extras);
+	currentBet.innerHTML = game.betAmount;
+	choiceDisplay.innerHTML = capitalizeFirstLetter(game.choice);
+	resultsDisplay.innerHTML = capitalizeFirstLetter(game.result);
+	winDisplay.innerHTML = winText;
+	scoreDisplay.innerHTML = game.score;
+	totalPlays.innerHTML = game.totalPlays;
+	playCredits.innerHTML = game.playCredits;
+
+}
+
+// this function capitalizes the first letter of a string
+function capitalizeFirstLetter (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// this function removes all of the list items from a list
+function clearElement (element) {
+	if (element) {
+		while (element.firstChild) {
+			element.removeChild(element.firstChild);
+		}
+	}
+}
+
+function makeBetbutton(amount) {
+	let betButton = document.createElement("button");
+	with (betButton) {
+		appendChild(document.createTextNode(amount));
+		value = amount;
+		type = "button";
+		addEventListener("click", function () {game.modAttr("betAmount", amount, true)}, false);
+		//addEventListener("click", function () {console.log("clicked button with " + this.value)}, false);
+	}
+	return betButton;
+}
+
+function makeBetButtons() {
+	let buttons = []
+	game.betOptions[game.curGame].forEach(function(amount) {
+		buttons.push(makeBetbutton(amount));
+	});
+	return buttons;
+}
+
+function displayBetButtons(buttons, row) {
+	buttons.forEach(function (button) {
+		row.cells[buttons.indexOf(button)].appendChild(button);
+		if(game.playCredits < button.value) {
+			button.disabled = true;
+		}
+	})
+}
+
+
+/*
 
 
 // list of the flags that may be passed in gameplay
@@ -79,34 +212,8 @@ if (myStorage.length) {
 	updateDisplay();
 }
 
-// this function takes a carrots or garbage guess, updates some game properties, checks to see if flags are tripped, and updates the display
-function choose (guess) {
-	game.choice = guess || "carrots";
-	game.result = getCarrotOrGarbage();
-	game.modAttr("playCredits",1);
-	game.addPlay();
-	checkFlags();
-	updateLocalStorage();
-	updateDisplay();
-}
 
-// this function capitalizes the first letter of a string
-function capitalizeFirstLetter (string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
-// this function generates a random integer, inclusively, between an upper and lower range
-function getRandomInt (upper, lower) {
-	const min = Math.ceil(lower || 0);
-	const max = Math.floor(upper || 1);
-	return Math.floor(Math.random() * (max + 1 - min) + min);
-}
-
-// this function returns a string of carrots or garbage
-function getCarrotOrGarbage () {
-	let rand = getRandomInt(2,1);
-	return rand > 1 ? "garbage" : "carrots";
-}
 
 // this function updates the local storage after a game play cycle
 function updateLocalStorage() {
@@ -129,52 +236,7 @@ function readLocalStorage() {
 	game.result = myStorage.getItem("result");
 }
 
-// this function updates the display after a game play cycle
-function updateDisplay () {
-	const [choiceDisplay] = document.getElementsByClassName("guess");
-	const [resultsDisplay] = document.getElementsByClassName("result");
-	const [winDisplay] = document.getElementsByClassName("win-lose");
-	const [scoreDisplay] = document.getElementsByClassName("score");
-	const [totalPlays] = document.getElementsByClassName("total-plays");
-	const [playCredits] = document.getElementsByClassName("play-credits");
-	const [flagDisplay] = document.getElementsByClassName("flag-display");
-	const [flagList] = document.getElementsByClassName("flag-list");
-	const [extras] = document.getElementsByClassName("extras");
-	const [activeExtras] = document.getElementsByClassName("active-extras");
 
-	let winText = "YOU LOSE!";
-
-	if(didWin(game.choice, game.result)) {
-		winText = "WINNER!";
-		game.modAttr("score",1);
-	} else {
-		game.modAttr("score",-1);
-	}
-
-	if (game.activeExtras && game.activeExtras.length > 0) {
-		game.activeExtras.forEach((extra) => {
-			let textNode = document.createTextNode(extra);
-			activeExtras.appendChild(textNode);
-		})
-	}
-
-	clearElement(flagList);
-	clearElement(extras);
-	displayTrippedFlags(flagList);
-	displayExtrasButtons(extras);
-	choiceDisplay.innerHTML = capitalizeFirstLetter(game.choice);
-	resultsDisplay.innerHTML = capitalizeFirstLetter(game.result);
-	winDisplay.innerHTML = winText;
-	scoreDisplay.innerHTML = game.score;
-	totalPlays.innerHTML = game.totalPlays;
-	playCredits.innerHTML = game.playCredits;
-
-}
-
-// this function returns true if the guess matched the result
-function didWin (guess, result) {
-	return guess === result;
-}
 
 // this function constructs a Flag object
 function Flag (flagName, attr, condition, condValue, extra) {
@@ -202,15 +264,6 @@ function buildFlags (flagList) {
 		return new Flag (flag.flagName, flag.attr, flag.condition, flag.condValue, flag.extra);
 	});
 	return flagArray;
-}
-
-// this function removes all of the list items from a list
-function clearElement (element) {
-	if (element) {
-		while (element.firstChild) {
-			element.removeChild(element.firstChild);
-		}
-	}
 }
 
 // this function checks the flags
@@ -256,3 +309,4 @@ function toggleActiveExtra(extra) {
 	}
 	updateDisplay();
 }
+*/

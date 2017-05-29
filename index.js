@@ -37,8 +37,7 @@ const game = {
 	choice: "",
 	result: "",
 	lastDidWin: false,
-	modAttr: function (attr, amount, relative) {
-		relative = relative || true;
+	modAttr: function (attr, amount, relative = true) {
 		if (relative) {
 			this[attr] += amount;
 		} else {
@@ -150,7 +149,7 @@ function makeBetbutton(amount) {
 		appendChild(document.createTextNode(amount));
 		value = amount;
 		type = "button";
-		addEventListener("click", function () {game.modAttr("betAmount", amount, true)}, false);
+		addEventListener("click", function () {game.modAttr("betAmount", amount, false)}, false);
 		//addEventListener("click", function () {console.log("clicked button with " + this.value)}, false);
 	}
 	return betButton;

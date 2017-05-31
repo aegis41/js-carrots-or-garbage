@@ -20,6 +20,29 @@ if (storageAvailable('localStorage')) {
 	canStore = true;
 }
 
+const flagList = [
+	{
+		"flagName": "Novice Better",
+		"attr": "totalPlays",
+		"condition": "===",
+		"condValue": "5",
+		"extra": {
+			"extraName": "Double Down",
+			"extraFunc": "doubleDown"
+		}
+	},
+	{
+		"flagName": "Experienced Better",
+		"attr": "totalPlays",
+		"condition": "===",
+		"condValue": "10",
+		"extra" : {
+			"extraName": "Better Chance",
+			"extraFunc": "betterChance"
+		}
+	}
+];
+
 // object keeping track of score, total plays, and play credits
 
 const game = {
@@ -37,6 +60,9 @@ const game = {
 	choice: "",
 	result: "",
 	lastDidWin: false,
+	// list of the flags that may be passed in gameplay
+	flagsToCheck: buildFlags (flagList),
+	trippedFlags: [],
 	modAttr: function (attr, amount, relative = true) {
 		if (relative) {
 			this[attr] += amount;
@@ -55,6 +81,7 @@ const game = {
 	}
 };
 
+
 // this function takes a carrots or garbage guess, updates some game properties, checks to see if flags are tripped, and updates the display
 function choose (guess) {
 	game.choice = guess || "carrots";
@@ -62,8 +89,8 @@ function choose (guess) {
 	game.modAttr("playCredits",1);
 	game.addPlay();
 	game.lastDidWin = didWin(game.choice, game.result);
-	game.lastDidWin ? game.modAttr("score", 1) : game.modAttr("score", -1);
-	//checkFlags();
+	game.lastDidWin ? game.modAttr("score", game.betAmount) : game.modAttr("score", -game.betAmount);
+	checkFlags(game.flagsToCheck, game.trippedFlags);
 	//updateLocalStorage();
 	updateDisplay();
 }
@@ -97,7 +124,7 @@ function updateDisplay () {
 	const [betButtons] = document.getElementsByClassName("bet-buttons");
 	const [currentBet] = document.getElementsByClassName("current-bet");
 	const [flagDisplay] = document.getElementsByClassName("flag-display");
-	const [flagList] = document.getElementsByClassName("flag-list");
+	const [flagListEl] = document.getElementsByClassName("flag-list");
 	const [extras] = document.getElementsByClassName("extras");
 	const [activeExtras] = document.getElementsByClassName("active-extras");
 
@@ -110,14 +137,14 @@ function updateDisplay () {
 	// 	})
 	// }
 
-	clearElement(flagList);
+	clearElement(flagListEl);
 	clearElement(extras);
 	for (let i = 0; i < betButtons.cells.length; i++) {
 		clearElement(betButtons.cells[i]);
 	}
 	clearElement(currentBet);
 	displayBetButtons(makeBetButtons(), betButtons);
-	//displayTrippedFlags(flagList);
+	displayTrippedFlags(game.trippedFlags, flagListEl);
 	//displayExtrasButtons(extras);
 	currentBet.innerHTML = game.betAmount;
 	choiceDisplay.innerHTML = capitalizeFirstLetter(game.choice);
@@ -172,70 +199,6 @@ function displayBetButtons(buttons, row) {
 	})
 }
 
-/*
-
-
-// list of the flags that may be passed in gameplay
-const flagList = [
-	{
-		"flagName": "Novice Better",
-		"attr": "totalPlays",
-		"condition": "===",
-		"condValue": "5",
-		"extra": {
-			"extraName": "Double Down",
-			"extraFunc": "doubleDown"
-		}
-	},
-	{
-		"flagName": "Experienced Better",
-		"attr": "totalPlays",
-		"condition": "===",
-		"condValue": "10",
-		"extra" : {
-			"extraName": "Better Chance",
-			"extraFunc": "betterChance"
-		}
-	}
-];
-
-// array of the flags that need to be checked each play cycle
-const flagsToCheck = buildFlags(flagList);
-//array of the flags that have already been tripped (reached achievements)
-const trippedFlags = [];
-
-// load in from local storage if there is one
-if (myStorage.length) {
-	readLocalStorage();
-	updateDisplay();
-}
-
-
-
-
-// this function updates the local storage after a game play cycle
-function updateLocalStorage() {
-	if(canStore) {
-		myStorage.setItem("score", game.score);
-		myStorage.setItem("totalPlays", game.totalPlays);
-		myStorage.setItem("playCredits", game.playCredits);
-		myStorage.setItem("activeExtras", game.activeExtras);
-		myStorage.setItem("choice", game.choice);
-		myStorage.setItem("result", game.result);
-	}
-}
-
-function readLocalStorage() {
-	game.score = parseInt(myStorage.getItem("score"));
-	game.totalPlays = parseInt(myStorage.getItem("totalPlays"));
-	game.playCredits = parseInt(myStorage.getItem("playCredits"));
-	game.activeExtras = myStorage.getItem("activeExtras");
-	game.choice = myStorage.getItem("choice");
-	game.result = myStorage.getItem("result");
-}
-
-
-
 // this function constructs a Flag object
 function Flag (flagName, attr, condition, condValue, extra) {
 	this.flagName = flagName;
@@ -265,7 +228,7 @@ function buildFlags (flagList) {
 }
 
 // this function checks the flags
-function checkFlags () {
+function checkFlags (flagsToCheck, trippedFlags) {
 	flagsToCheck.forEach((flag) => {
 		let tripped = flag.checkMe();
 		if (tripped) {
@@ -275,7 +238,7 @@ function checkFlags () {
 	});
 }
 
-function displayTrippedFlags (trippedList) {
+function displayTrippedFlags (trippedFlags, trippedList) {
 	if(trippedFlags && trippedFlags.length > 0) {
 		trippedFlags.forEach((flag => {
 			let listItem = document.createElement("li");
@@ -285,6 +248,7 @@ function displayTrippedFlags (trippedList) {
 	)}
 }
 
+/*
 function displayExtrasButtons (extrasElement) {
 	if(trippedFlags && trippedFlags.length > 0) {
 		trippedFlags.forEach((flag => {
@@ -306,5 +270,33 @@ function toggleActiveExtra(extra) {
 		game.activeExtras.splice(game.activeExtras.indexOf(extra),1);
 	}
 	updateDisplay();
+}
+
+
+// load in from local storage if there is one
+if (myStorage.length) {
+	readLocalStorage();
+	updateDisplay();
+}
+
+// this function updates the local storage after a game play cycle
+function updateLocalStorage() {
+	if(canStore) {
+		myStorage.setItem("score", game.score);
+		myStorage.setItem("totalPlays", game.totalPlays);
+		myStorage.setItem("playCredits", game.playCredits);
+		myStorage.setItem("activeExtras", game.activeExtras);
+		myStorage.setItem("choice", game.choice);
+		myStorage.setItem("result", game.result);
+	}
+}
+
+function readLocalStorage() {
+	game.score = parseInt(myStorage.getItem("score"));
+	game.totalPlays = parseInt(myStorage.getItem("totalPlays"));
+	game.playCredits = parseInt(myStorage.getItem("playCredits"));
+	game.activeExtras = myStorage.getItem("activeExtras");
+	game.choice = myStorage.getItem("choice");
+	game.result = myStorage.getItem("result");
 }
 */

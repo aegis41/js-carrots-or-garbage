@@ -104,8 +104,12 @@ function getRandomInt (upper, lower) {
 
 // this function returns a string of carrots or garbage
 function getCarrotOrGarbage () {
-	let rand = getRandomInt(2,1);
-	return rand > 1 ? "garbage" : "carrots";
+	let rand= getRandomInt(4,1),
+		threshold = 2;
+	if (checkActiveExtra("Better Chance") !== -1) {
+		threshold = 3;
+	}
+	return rand > threshold ? getOppositeGuess() : game.choice;
 }
 
 // this function returns true if the guess matched the result
@@ -130,12 +134,6 @@ function updateDisplay () {
 
 	let winText = game.lastDidWin ? "WINNER!" : "You Lose!!";
 
-	// if (game.activeExtras && game.activeExtras.length > 0) {
-	// 	game.activeExtras.forEach((extra) => {
-	// 		let textNode = document.createTextNode(extra);
-	// 		activeExtras.appendChild(textNode);
-	// 	})
-	// }
 
 	clearElement(flagListEl);
 	clearElement(extras);
@@ -143,9 +141,16 @@ function updateDisplay () {
 		clearElement(betButtons.cells[i]);
 	}
 	clearElement(currentBet);
+	clearElement(activeExtras);
+	if (game.activeExtras && game.activeExtras.length > 0) {
+		game.activeExtras.forEach((extra) => {
+			let textNode = document.createTextNode(extra);
+			activeExtras.appendChild(textNode);
+		})
+	}
 	displayBetButtons(makeBetButtons(), betButtons);
 	displayTrippedFlags(game.trippedFlags, flagListEl);
-	//displayExtrasButtons(extras);
+	displayExtrasButtons(extras, game.trippedFlags);
 	currentBet.innerHTML = game.betAmount;
 	choiceDisplay.innerHTML = capitalizeFirstLetter(game.choice);
 	resultsDisplay.innerHTML = capitalizeFirstLetter(game.result);
@@ -168,6 +173,13 @@ function clearElement (element) {
 			element.removeChild(element.firstChild);
 		}
 	}
+}
+
+function getOppositeGuess() {
+	if (game.choice = "carrots") {
+		return "garbage";
+	}
+	return "carrots";
 }
 
 function makeBetbutton(amount) {
@@ -248,9 +260,8 @@ function displayTrippedFlags (trippedFlags, trippedList) {
 	)}
 }
 
-/*
-function displayExtrasButtons (extrasElement) {
-	if(trippedFlags && trippedFlags.length > 0) {
+function displayExtrasButtons (extrasElement, trippedFlags) {
+	if (trippedFlags && trippedFlags.length > 0) {
 		trippedFlags.forEach((flag => {
 			let extraButton = document.createElement("button");
 			with (extraButton) {
@@ -263,8 +274,15 @@ function displayExtrasButtons (extrasElement) {
 	)}
 }
 
+function checkActiveExtra(extra) {
+	if (game.activeExtras.indexOf(extra) === -1) {
+		return false;
+	}
+	return true;
+}
+
 function toggleActiveExtra(extra) {
-	if(game.activeExtras.indexOf(extra) === -1) {
+	if (game.activeExtras.indexOf(extra) === -1) {
 		game.activeExtras.push(extra);
 	} else {
 		game.activeExtras.splice(game.activeExtras.indexOf(extra),1);
@@ -272,7 +290,7 @@ function toggleActiveExtra(extra) {
 	updateDisplay();
 }
 
-
+/*
 // load in from local storage if there is one
 if (myStorage.length) {
 	readLocalStorage();

@@ -20,7 +20,6 @@ if (storageAvailable('localStorage')) {
 	canStore = true;
 }
 
-
 // object keeping track of score, total plays, and play credits
 
 const game = {
@@ -70,10 +69,43 @@ const flagList = [
 	}
 ];
 
-// array of the flags that need to be checked each play cycle
-const flagsToCheck = buildFlags(flagList);
-//array of the flags that have already been tripped (reached achievements)
-const trippedFlags = [];
+// object keeping track of score, total plays, and play credits
+
+const game = {
+	curGame: "guess",
+	betOptions: {
+		guess: [1, 5, 10, 25, 50],
+		haul: [50, 100, 250, 500, 750],
+		match: [750, 1000, 1500, 2500, 5000]
+	},
+	betAmount: 1,
+	score: 0,
+	totalPlays: 0,
+	playCredits: 0,
+	activeExtras: [],
+	choice: "",
+	result: "",
+	lastDidWin: false,
+	// list of the flags that may be passed in gameplay
+	flagsToCheck: buildFlags (flagList),
+	trippedFlags: [],
+	modAttr: function (attr, amount, relative = true) {
+		if (relative) {
+			this[attr] += amount;
+		} else {
+			this[attr] = amount;
+		}
+	},
+	addPlay: function () {
+		++this.totalPlays;
+	},
+	get: function(attr) {
+		return game[attr];
+	},
+	set: function(attr, value) {
+		game[attr] = value;
+	}
+};
 
 // load in from local storage if there is one
 window.onload = function () {
@@ -95,14 +127,11 @@ function choose (guess) {
 		game.winText = "Aww. You lost.";
 	}
 	game.addPlay();
-	checkFlags();
-	updateLocalStorage();
+	game.lastDidWin = didWin(game.choice, game.result);
+	game.lastDidWin ? game.modAttr("score", game.betAmount) : game.modAttr("score", -game.betAmount);
+	checkFlags(game.flagsToCheck, game.trippedFlags);
+	//updateLocalStorage();
 	updateDisplay();
-}
-
-// this function capitalizes the first letter of a string
-function capitalizeFirstLetter (string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 // this function generates a random integer, inclusively, between an upper and lower range
@@ -114,29 +143,17 @@ function getRandomInt (upper, lower) {
 
 // this function returns a string of carrots or garbage
 function getCarrotOrGarbage () {
-	let rand = getRandomInt(2,1);
-	return rand > 1 ? "garbage" : "carrots";
-}
-
-// this function updates the local storage after a game play cycle
-function updateLocalStorage() {
-	if(canStore) {
-		myStorage.setItem("score", game.score);
-		myStorage.setItem("totalPlays", game.totalPlays);
-		myStorage.setItem("playCredits", game.playCredits);
-		myStorage.setItem("activeExtras", game.activeExtras);
-		myStorage.setItem("choice", game.choice);
-		myStorage.setItem("result", game.result);
+	let rand= getRandomInt(4,1),
+		threshold = 2;
+	if (checkActiveExtra("Better Chance") !== -1) {
+		threshold = 3;
 	}
+	return rand > threshold ? getOppositeGuess() : game.choice;
 }
 
-function readLocalStorage() {
-	game.score = parseInt(myStorage.getItem("score"));
-	game.totalPlays = parseInt(myStorage.getItem("totalPlays"));
-	game.playCredits = parseInt(myStorage.getItem("playCredits"));
-	game.activeExtras = myStorage.getItem("activeExtras");
-	game.choice = myStorage.getItem("choice");
-	game.result = myStorage.getItem("result");
+// this function returns true if the guess matched the result
+function didWin (guess, result) {
+	return guess === result;
 }
 
 function clearLocalStorage() {
@@ -152,10 +169,23 @@ function updateDisplay () {
 	const [scoreDisplay] = document.getElementsByClassName("score");
 	const [totalPlays] = document.getElementsByClassName("total-plays");
 	const [playCredits] = document.getElementsByClassName("play-credits");
+	const [betButtons] = document.getElementsByClassName("bet-buttons");
+	const [currentBet] = document.getElementsByClassName("current-bet");
 	const [flagDisplay] = document.getElementsByClassName("flag-display");
-	const [flagList] = document.getElementsByClassName("flag-list");
+	const [flagListEl] = document.getElementsByClassName("flag-list");
 	const [extras] = document.getElementsByClassName("extras");
 	const [activeExtras] = document.getElementsByClassName("active-extras");
+
+	let winText = game.lastDidWin ? "WINNER!" : "You Lose!!";
+
+
+	clearElement(flagListEl);
+	clearElement(extras);
+	for (let i = 0; i < betButtons.cells.length; i++) {
+		clearElement(betButtons.cells[i]);
+	}
+	clearElement(currentBet);
+	clearElement(activeExtras);
 
 	if (game.activeExtras && game.activeExtras.length > 0) {
 		game.activeExtras.forEach((extra) => {
@@ -163,11 +193,10 @@ function updateDisplay () {
 			activeExtras.appendChild(textNode);
 		})
 	}
-
-	clearElement(flagList);
-	clearElement(extras);
-	displayTrippedFlags(flagList);
-	displayExtrasButtons(extras);
+	displayBetButtons(makeBetButtons(), betButtons);
+	displayTrippedFlags(game.trippedFlags, flagListEl);
+	displayExtrasButtons(extras, game.trippedFlags);
+	currentBet.innerHTML = game.betAmount;
 	choiceDisplay.innerHTML = capitalizeFirstLetter(game.choice);
 	resultsDisplay.innerHTML = capitalizeFirstLetter(game.result);
 	winDisplay.innerHTML = game.winText;
@@ -177,9 +206,54 @@ function updateDisplay () {
 
 }
 
-// this function returns true if the guess matched the result
-function didWin (guess, result) {
-	return guess === result;
+// this function capitalizes the first letter of a string
+function capitalizeFirstLetter (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// this function removes all of the list items from a list
+function clearElement (element) {
+	if (element) {
+		while (element.firstChild) {
+			element.removeChild(element.firstChild);
+		}
+	}
+}
+
+function getOppositeGuess() {
+	if (game.choice = "carrots") {
+		return "garbage";
+	}
+	return "carrots";
+}
+
+function makeBetbutton(amount) {
+	let betButton = document.createElement("button");
+	with (betButton) {
+		appendChild(document.createTextNode(amount));
+		value = amount;
+		type = "button";
+		addEventListener("click", function () {game.modAttr("betAmount", amount, false)}, false);
+		//addEventListener("click", function () {console.log("clicked button with " + this.value)}, false);
+	}
+	return betButton;
+}
+
+function makeBetButtons() {
+	let buttons = []
+	game.betOptions[game.curGame].forEach(function(amount) {
+		buttons.push(makeBetbutton(amount));
+	});
+	return buttons;
+}
+
+function displayBetButtons(buttons, row) {
+	buttons.forEach(function (button) {
+		row.cells[buttons.indexOf(button)].appendChild(button);
+		if(game.playCredits < button.value) {
+			button.disabled = true;
+		}
+	})
 }
 
 // this function constructs a Flag object
@@ -210,17 +284,8 @@ function buildFlags (flagList) {
 	return flagArray;
 }
 
-// this function removes all of the list items from a list
-function clearElement (element) {
-	if (element) {
-		while (element.firstChild) {
-			element.removeChild(element.firstChild);
-		}
-	}
-}
-
 // this function checks the flags
-function checkFlags () {
+function checkFlags (flagsToCheck, trippedFlags) {
 	flagsToCheck.forEach((flag) => {
 		let tripped = flag.checkMe();
 		if (tripped) {
@@ -230,7 +295,7 @@ function checkFlags () {
 	});
 }
 
-function displayTrippedFlags (trippedList) {
+function displayTrippedFlags (trippedFlags, trippedList) {
 	if(trippedFlags && trippedFlags.length > 0) {
 		trippedFlags.forEach((flag => {
 			let listItem = document.createElement("li");
@@ -240,8 +305,8 @@ function displayTrippedFlags (trippedList) {
 	)}
 }
 
-function displayExtrasButtons (extrasElement) {
-	if(trippedFlags && trippedFlags.length > 0) {
+function displayExtrasButtons (extrasElement, trippedFlags) {
+	if (trippedFlags && trippedFlags.length > 0) {
 		trippedFlags.forEach((flag => {
 			let extraButton = document.createElement("button");
 			with (extraButton) {
@@ -254,11 +319,47 @@ function displayExtrasButtons (extrasElement) {
 	)}
 }
 
+function checkActiveExtra(extra) {
+	if (game.activeExtras.indexOf(extra) === -1) {
+		return false;
+	}
+	return true;
+}
+
 function toggleActiveExtra(extra) {
-	if(game.activeExtras.indexOf(extra) === -1) {
+	if (game.activeExtras.indexOf(extra) === -1) {
 		game.activeExtras.push(extra);
 	} else {
 		game.activeExtras.splice(game.activeExtras.indexOf(extra),1);
 	}
 	updateDisplay();
 }
+
+/*
+// load in from local storage if there is one
+if (myStorage.length) {
+	readLocalStorage();
+	updateDisplay();
+}
+
+// this function updates the local storage after a game play cycle
+function updateLocalStorage() {
+	if(canStore) {
+		myStorage.setItem("score", game.score);
+		myStorage.setItem("totalPlays", game.totalPlays);
+		myStorage.setItem("playCredits", game.playCredits);
+		myStorage.setItem("activeExtras", game.activeExtras);
+		myStorage.setItem("choice", game.choice);
+		myStorage.setItem("result", game.result);
+	}
+}
+
+function readLocalStorage() {
+	game.score = parseInt(myStorage.getItem("score"));
+	game.totalPlays = parseInt(myStorage.getItem("totalPlays"));
+	game.playCredits = parseInt(myStorage.getItem("playCredits"));
+	game.activeExtras = myStorage.getItem("activeExtras");
+	game.choice = myStorage.getItem("choice");
+	game.result = myStorage.getItem("result");
+}
+*/

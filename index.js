@@ -22,27 +22,27 @@ if (storageAvailable('localStorage')) {
 
 // object keeping track of score, total plays, and play credits
 
-const game = {
-	score: 0,
-	totalPlays: 0,
-	playCredits: 0,
-	activeExtras: [],
-	choice: "",
-	result: "",
-	didWin: false,
-	winText: "",
-	modAttr: function (attr, amount, relative) {
-		relative = relative || true;
-		if (relative) {
-			this[attr] += amount;
-		} else {
-			this[attr] = amount;
-		}
-	},
-	addPlay: function () {
-		++this.totalPlays;
-	}
-};
+// const game = {
+// 	score: 0,
+// 	totalPlays: 0,
+// 	playCredits: 0,
+// 	activeExtras: [],
+// 	choice: "",
+// 	result: "",
+// 	didWin: false,
+// 	winText: "",
+// 	modAttr: function (attr, amount, relative) {
+// 		relative = relative || true;
+// 		if (relative) {
+// 			this[attr] += amount;
+// 		} else {
+// 			this[attr] = amount;
+// 		}
+// 	},
+// 	addPlay: function () {
+// 		++this.totalPlays;
+// 	}
+// };
 
 
 // list of the flags that may be passed in gameplay
@@ -233,10 +233,18 @@ function makeBetbutton(amount) {
 		appendChild(document.createTextNode(amount));
 		value = amount;
 		type = "button";
-		addEventListener("click", function () {game.modAttr("betAmount", amount, false)}, false);
+		dataset.bet = amount;
+		onClick = function () {
+			changeBetClick(amount);
+		}
 		//addEventListener("click", function () {console.log("clicked button with " + this.value)}, false);
 	}
 	return betButton;
+}
+
+function changeBetClick (amount) {
+	console.log(amount);
+	game.modAttr("betAmount", amount, false);
 }
 
 function makeBetButtons() {

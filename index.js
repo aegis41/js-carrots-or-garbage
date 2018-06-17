@@ -229,22 +229,18 @@ function getOppositeGuess() {
 
 function makeBetbutton(amount) {
 	let betButton = document.createElement("button");
+	let dataAttr = "bet-" + amount.toString();
 	with (betButton) {
 		appendChild(document.createTextNode(amount));
 		value = amount;
 		type = "button";
-		dataset.bet = amount;
-		onClick = function () {
-			changeBetClick(amount);
-		}
+		dataset[dataAttr] = amount;
+		onclick = function () {
+			changeBetClick(amount)
+		};
 		//addEventListener("click", function () {console.log("clicked button with " + this.value)}, false);
 	}
 	return betButton;
-}
-
-function changeBetClick (amount) {
-	console.log(amount);
-	game.modAttr("betAmount", amount, false);
 }
 
 function makeBetButtons() {
@@ -255,6 +251,16 @@ function makeBetButtons() {
 	return buttons;
 }
 
+function changeBetClick (amount) {
+	let curDataAtter = `[data-bet-${game.betAmount.toString()}]`;
+	let clickedDataAttr = `[data-bet-${amount.toString()}]`;
+	[curButton] = document.querySelectorAll(curDataAtter);
+	[clickedButton] = document.querySelectorAll(clickedDataAttr);
+	toggleClass(curButton, "active-bet");
+	toggleClass(clickedButton, "active-bet");
+	game.modAttr("betAmount", amount, false);
+}
+
 function displayBetButtons(buttons, row) {
 	buttons.forEach(function (button) {
 		row.cells[buttons.indexOf(button)].appendChild(button);
@@ -262,6 +268,18 @@ function displayBetButtons(buttons, row) {
 			button.disabled = true;
 		}
 	})
+}
+
+function toggleClass (element, className) {
+  let classList = element.className;
+  classList = classList.split(" ");
+  let hasClass = classList.indexOf(className);
+  if (hasClass !== -1) {
+    classList.splice(hasClass, 1).join(" ");
+  } else {
+    classList.push(className);
+  }
+  element.className = classList.join(" ");
 }
 
 // this function constructs a Flag object

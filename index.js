@@ -268,6 +268,7 @@ function changeBetClick (amount) {
 	toggleClass(curButton, "active-bet");
 	toggleClass(clickedButton, "active-bet");
 	game.modAttr("betAmount", amount, false);
+	updateDisplay();
 }
 
 function displayBetButtons(buttons, row) {

@@ -227,7 +227,7 @@ function getOppositeGuess() {
 	return "carrots";
 }
 
-function makeBetbutton(amount) {
+function makeBetButton(amount) {
 	let betButton = document.createElement("button");
 	let dataAttr = "bet-" + amount.toString();
 	with (betButton) {
@@ -244,10 +244,19 @@ function makeBetbutton(amount) {
 }
 
 function makeBetButtons() {
-	let buttons = []
-	game.betOptions[game.curGame].forEach(function(amount) {
-		buttons.push(makeBetbutton(amount));
-	});
+	let buttons = {};
+	let betOptions = game.betOptions;
+	for (let gameName in betOptions) {
+		if (betOptions.hasOwnProperty(gameName)) {
+			buttons[gameName] = [];
+			betOptions[gameName].forEach((amount) => {
+				buttons[gameName].push(makeBetButton(amount));
+			});
+		}
+	}
+	// game.betOptions[game.curGame].forEach(function(amount) {
+	// 	buttons.push(makeBetbutton(amount));
+	// });
 	return buttons;
 }
 
@@ -262,7 +271,11 @@ function changeBetClick (amount) {
 }
 
 function displayBetButtons(buttons, row) {
+	buttons = buttons[game.curGame];
 	buttons.forEach(function (button) {
+		if (game.betAmount === parseInt(button.value)) {
+			button.className += "active-bet";
+		}
 		row.cells[buttons.indexOf(button)].appendChild(button);
 		if(game.playCredits < button.value) {
 			button.disabled = true;

@@ -20,31 +20,6 @@ if (storageAvailable('localStorage')) {
 	canStore = true;
 }
 
-// object keeping track of score, total plays, and play credits
-
-// const game = {
-// 	score: 0,
-// 	totalPlays: 0,
-// 	playCredits: 0,
-// 	activeExtras: [],
-// 	choice: "",
-// 	result: "",
-// 	didWin: false,
-// 	winText: "",
-// 	modAttr: function (attr, amount, relative) {
-// 		relative = relative || true;
-// 		if (relative) {
-// 			this[attr] += amount;
-// 		} else {
-// 			this[attr] = amount;
-// 		}
-// 	},
-// 	addPlay: function () {
-// 		++this.totalPlays;
-// 	}
-// };
-
-
 // list of the flags that may be passed in gameplay
 const flagList = [
 	{
@@ -170,7 +145,7 @@ function updateDisplay () {
 	const [totalPlays] = document.getElementsByClassName("total-plays");
 	const [playCredits] = document.getElementsByClassName("play-credits");
 	const [betButtons] = document.getElementsByClassName("bet-buttons");
-	const [currentBet] = document.getElementsByClassName("current-bet");
+	// const [currentBet] = document.getElementsByClassName("current-bet");
 	const [flagDisplay] = document.getElementsByClassName("flag-display");
 	const [flagListEl] = document.getElementsByClassName("flag-list");
 	const [extras] = document.getElementsByClassName("extras");
@@ -184,7 +159,7 @@ function updateDisplay () {
 	for (let i = 0; i < betButtons.cells.length; i++) {
 		clearElement(betButtons.cells[i]);
 	}
-	clearElement(currentBet);
+	// clearElement(currentBet);
 	clearElement(activeExtras);
 
 	if (game.activeExtras && game.activeExtras.length > 0) {
@@ -196,7 +171,7 @@ function updateDisplay () {
 	displayBetButtons(makeBetButtons(), betButtons);
 	displayTrippedFlags(game.trippedFlags, flagListEl);
 	displayExtrasButtons(extras, game.trippedFlags);
-	currentBet.innerHTML = game.betAmount;
+	// currentBet.innerHTML = game.betAmount;
 	choiceDisplay.innerHTML = capitalizeFirstLetter(game.choice);
 	resultsDisplay.innerHTML = capitalizeFirstLetter(game.result);
 	winDisplay.innerHTML = game.winText;

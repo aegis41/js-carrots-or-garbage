@@ -1,48 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<script type="text/javascript" src="./index.js"></script>
-	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
-	<meta charset="UTF-8">
-	<title>Carrots or Garbage</title>
+    <script type="text/javascript" src="./index.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <meta charset="UTF-8">
+    <title>Carrots or Garbage</title>
 </head>
 <body>
-	<button onclick="clearLocalStorage()">Clear Local Storage</button>
-	<h1>Carrots or Garbage</h1>
-	<h2>Score: <span class="score">0</span></h2>
-	<p>Total Plays: <span class="total-plays">0</span> | Play Credits: <span class="play-credits">0</span></p>
-	<p class="active-extras"></p>
-	<div>
-		<h2>Betting Options</h2>
-		<table>
-			<tr class="bet-buttons">
-				<td class="bet-button"></td>
-				<td class="bet-button"></td>
-				<td class="bet-button"></td>
-				<td class="bet-button"></td>
-				<td class="bet-button"></td>
-			</tr>
-		</table>
-		<h2>Current Bet</h2>
-		<p class="current-bet"></p>
-	</div>
-	<p>Pick one:</p>
-	<div>
-		<button onclick="choose('carrots')">Carrots</button> OR <button onclick="choose('garbage')">Garbage</button>
-	</div>
-	<div class="results">
-		<h2>Results</h2>
-		<p>You guessed: <span class="guess"></span></p>
-		<p>Results: <span class="result"></span></p>
-		<p class="win-lose"></p>
-	</div>
-	<div class="flag-display">
-		<h2>Achievements</h2>
-		<ul class="flag-list">
-		</ul>
-	</div>
-	<div class="extras">
-		
-	</div>
+    <header>
+        <h1 class="game-title">Carrots or Garbage</h1>
+    </header>
+    <div class="hud-container">
+        <div class="score-section">
+            <h2>Carrots: <span class="score">0</span></h2>
+            <p>Total Plays:
+                <span class="total-plays">0</span> | Play Credits: <span class="play-credits">0</span>
+            </p>
+            <p class="active-extras"></p>
+        </div>
+        <div class="bet-section">
+            <h2>Betting Options</h2>
+            <table>
+                <tr class="bet-buttons">
+                    <td class="bet-button"></td>
+                    <td class="bet-button"></td>
+                    <td class="bet-button"></td>
+                    <td class="bet-button"></td>
+                    <td class="bet-button"></td>
+                </tr>
+            </table>
+            <!--
+            <h2>Current Bet</h2>
+            <p class="current-bet"></p>
+            -->
+        </div>
+    </div>
+    <div class="choice-section">
+        <h3>Pick One:</h3>
+        <button class="choice carrots" onclick="choose('carrots')">CARROTS</button> OR <button class="choice garbage" onclick="choose('garbage')">GARBAGE</button>
+    </div>
+    <div class="results">
+        <h2>Results</h2>
+        <p>You guessed: <span class="guess"></span></p>
+        <p>Results: <span class="result"></span></p>
+        <p class="win-lose"></p>
+    </div>
+    <div class="flag-display">
+        <h2>Achievements</h2>
+        <ul class="flag-list">
+        </ul>
+    </div>
+    <div class="extras">
+
+    </div>
 </body>
 </html>

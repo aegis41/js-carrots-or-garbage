@@ -1,32 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<script type="text/javascript" src="./index.js"></script>
-	<meta charset="UTF-8">
-	<title>Carrots or Garbage</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrots or Garbage</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-	<h1>Carrots or Garbage</h1>
-	<h2>Score: <span class="score">0</span></h2>
-	<p>Total Plays: <span class="total-plays">0</span> | Play Credits: <span class="play-credits">0</span></p>
-	<p class="active-extras"></p>
-	<p>Pick one:</p>
-	<div>
-		<button onclick="choose('carrots')">Carrots</button> OR <button onclick="choose('garbage')">Garbage</button>
-	</div>
-	<div class="results">
-		<h2>Results</h2>
-		<p>You guessed: <span class="guess"></span></p>
-		<p>Results: <span class="result"></span></p>
-		<p class="win-lose"></p>
-	</div>
-	<div class="flag-display">
-		<h2>Achievements</h2>
-		<ul class="flag-list">
-		</ul>
-	</div>
-	<div class="extras">
-		
-	</div>
+    <div id="app">
+        <!-- Home Screen, Game Screen, Game Over, etc. -->
+        <div id="home-screen">
+            <h1>Carrots or Garbage</h1>
+            <button id="start-game">Start New Game</button>
+            <button id="continue-game">Continue Game</button>
+            <button id="clear-progress">Clear Progress</button>
+            <button id="view-stats">View Statistics</button>
+        </div>
+
+        <div id="game-screen" style="display: none;">
+            <h2>Place Your Bet</h2>
+            <div id="bet-amounts"></div>
+            <button id="bet-carrots">Bet Carrots</button>
+            <button id="bet-garbage">Bet Garbage</button>
+            <div id="result-display"></div>
+        </div>
+        
+        <!-- Additional screens will go here -->
+    </div>
+    <script src="app.js"></script>
 </body>
 </html>

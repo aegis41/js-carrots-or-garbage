@@ -70,8 +70,8 @@ const loadGameState = () => {
     if (savedState) {
         gameState = JSON.parse(savedState);
         console.log('Game state loaded:', gameState);
-        updateHUD();
     }
+    updateHUD();
 }
 
 window.onload = () => {
@@ -107,7 +107,7 @@ document.getElementById('continue-game').addEventListener('click', () => {
     updateHUD();
 });
 
-document.getElementById('clear-progress').addEventListener('click', clearGameProgress());
+document.getElementById('clear-progress').addEventListener('click', clearGameProgress);
 
 // Function to start a new game
 const newGame = () => {

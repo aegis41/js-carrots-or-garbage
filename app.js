@@ -99,6 +99,17 @@ document.getElementById('restart-game').addEventListener('click', () => {
     document.getElementById('game-over-modal').style.display = 'none';
 });
 
+document.getElementById('quit-game').addEventListener('click', () => {
+    // hide the game screen
+    document.getElementById('game-screen').style.display = 'none';
+    //show the home screen
+    document.getElementById('home-screen').style.display = 'block';
+    console.log('Game quit, returning to home screen');
+})
+
+// END OF BUTTON BLOCK //
+// ******************* //
+
 document.getElementById('continue-game').addEventListener('click', () => {
     loadGameState();
     document.getElementById('home-screen').style.display = 'none';
@@ -111,6 +122,8 @@ document.getElementById('clear-progress').addEventListener('click', clearGamePro
 
 // Function to start a new game
 const newGame = () => {
+    console.log(gameState);
+    let increment = gameState.results.turns === 0 ? 0 : 1;
     gameState = {
         money: 100,
         currentBet: 1,
@@ -131,7 +144,7 @@ const newGame = () => {
                 garbage: 0
             }
         },
-        games: gameState.games + 1,
+        games: gameState.games + increment,
         resets: gameState.resets
     };
 

@@ -142,6 +142,19 @@ p {
     border: 2px solid #ccc;
 }
 
+#control-buttons {
+
+}
+
+#quit-game {
+    padding: 10px 20px;
+    font-size: 18px;
+    margin: 10px;
+    background-color: #f66;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+}
+
 .hud-label {
     font-size: 11px;
     color:#717171;

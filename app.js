@@ -159,22 +159,22 @@ const updateResultDisplay = (type, resultType, outcome) => {
 
     // Create the text elements
     const betText = document.createElement('p');
-    betText.textContent = `Bet: ${type}`;
+    betText.innerHTML = `<span class="hud-label">Bet:</span> <span class="hud-value">${type}</span>`;
 
     const resultText = document.createElement('p');
-    resultText.textContent = `Result: ${resultType}`;
+    resultText.innerHTML = `<span class="hud-label">Result:</span> <span class="hud-value">${resultType}</span>`;
 
     const outcomeText = document.createElement('p');
-    outcomeText.textContent = outcome === 'win' ? 'You Won!' : 'You Lost!';
+    outcomeText.innerHTML = outcome === 'win' ? 'You Won!' : 'You Lost!';
 
     const betAmountText = document.createElement('p');
-    betAmountText.textContent = `Bet Amount: $${gameState.currentBet}`;
+    betAmountText.innerHTML = `<span class="hud-label">Bet Amount:</span> <span class="hud-value">$${gameState.currentBet}</span>`;
 
     const winningsText = document.createElement('p');
-    winningsText.textContent = `Winnings Amount: $${outcome === 'win' ? gameState.currentBet * 2 : -gameState.currentBet}`;
+    winningsText.innerHTML = `<span class="hud-label">Winnings Amount:</span> <span class="hud-value">$${outcome === 'win' ? gameState.currentBet * 2 : -gameState.currentBet}</span>`;
 
     const balanceText = document.createElement('p');
-    balanceText.textContent = `New Balance: $${gameState.money}`;
+    balanceText.innerHTML = `<span class="hud-label">New Balance:</span> <span class="hud-value">$${gameState.money}</span>`;
 
     // Append all elements to the result container
     resultContainer.appendChild(overlay);

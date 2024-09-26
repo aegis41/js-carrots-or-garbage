@@ -23,7 +23,65 @@ let gameState = {
     resets: 0 // number of resets
 };
 
-// Start game button event listener
+// Function to save game state to localStorage
+const saveGameState = () => {
+    localStorage.setItem('carrotsOrGarbageGameState', JSON.stringify(gameState));
+    console.log('Game state saved', gameState);
+};
+
+// Function to clear saved game state from local storage.
+const clearGameProgress = () => {
+    const newGameState = {
+        money: 100,
+        currentBet: 1,
+        betAmounts: [1, 5, 10],
+        bets: {
+            carrots: 0,
+            garbage: 0
+        },
+        results: {
+            turns: 0, // total number of turns
+            turnsHistory: [], //log of each turn's details
+            wins: {
+                carrots: 0,
+                garbage: 0
+            },
+            losses: {
+                carrots: 0,
+                garbage: 0
+            }
+        },
+        games: gameState.games,
+        resets: gameState.resets + 1
+    };
+
+    // Save tthe new game state to local storage
+    localStorage.setItem('carrotsOrGarbageGameState', JSON.stringify(newGameState));
+    console.log('Game progress reset', newGameState);
+
+    //update the HUD to reflect the fresh game state
+    gameState = newGameState;
+    updateHUD();    
+};
+
+// Function to load the game state from local storage
+const loadGameState = () => {
+    const savedState = localStorage.getItem('carrotsOrGarbageGameState');
+    if (savedState) {
+        gameState = JSON.parse(savedState);
+        console.log('Game state loaded:', gameState);
+        updateHUD();
+    }
+}
+
+window.onload = () => {
+    loadGameState();
+};
+
+
+// BUTTON EVENT LISTENER BLOCK ******//
+// BUTTONS HERE *********************//
+// Start game button event listener *//
 document.getElementById('start-game').addEventListener('click', () => {
     newGame();
 });
@@ -40,6 +98,16 @@ document.getElementById('restart-game').addEventListener('click', () => {
     newGame();
     document.getElementById('game-over-modal').style.display = 'none';
 });
+
+document.getElementById('continue-game').addEventListener('click', () => {
+    loadGameState();
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'block';
+    renderBetAmountButtons();
+    updateHUD();
+});
+
+document.getElementById('clear-progress').addEventListener('click', clearGameProgress());
 
 // Function to start a new game
 const newGame = () => {
@@ -143,6 +211,7 @@ const placeBet = (type) => {
         });
         updateHUD();
         checkGameOver();
+        saveGameState();
     } else {
         alert('Not enough money to place this bet.');
     }

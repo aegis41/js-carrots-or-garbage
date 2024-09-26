@@ -47,6 +47,22 @@
             </div>
         </div>
 
+        <!-- Container for the Game Over Modal: Will be used to display game stats and trigger new games or -->
+        <!-- return to the home screen -->
+        <div id="game-over-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Game Over</h2>
+                <p>You've run out of money.</p>
+                <p>Final Stats:</p>
+                <ul>
+                    <li>Total Turns: <span id="final-turns"></span></li>
+                    <li>Carrot Wins: <span id="final-carrot-wins"></span></li>
+                    <li>Garbage Wins: <span id="final-garbage-wins"></span></li>
+                </ul>
+                <button id="restart-game">Restart Game</button>
+            </div>
+
+        </div>
         <!-- Additional screens will go here -->
     </div>
     <script src="app.js"></script>

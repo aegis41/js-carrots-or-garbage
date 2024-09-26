@@ -36,6 +36,11 @@ document.getElementById('bet-garbage').addEventListener('click', () => {
     placeBet('garbage');
 });
 
+document.getElementById('restart-game').addEventListener('click', () => {
+    newGame();
+    document.getElementById('game-over-modal').style.display = 'none';
+});
+
 // Function to start a new game
 const newGame = () => {
     gameState = {
@@ -75,6 +80,18 @@ const newGame = () => {
 
     // Render the bet buttons
     renderBetAmountButtons();
+    updateHUD();
+    clearResultsHUD();
+};
+
+const triggerGameOver = () => {
+    // Display Final Stats
+    document.getElementById('final-turns').textContent = gameState.results.turns;
+    document.getElementById('final-carrot-wins').textContent = gameState.results.wins.carrots;
+    document.getElementById('final-garbage-wins').textContent = gameState.results.wins.garbage;
+
+    //show the Game Over modal
+    document.getElementById('game-over-modal').style.display = 'block';
 };
 
 // Function to render the bet amount buttons from the gameState.betAmounts array
@@ -125,8 +142,15 @@ const placeBet = (type) => {
             }
         });
         updateHUD();
+        checkGameOver();
     } else {
         alert('Not enough money to place this bet.');
+    }
+};
+
+const checkGameOver = () => {
+    if (gameState.money <= 0) {
+        triggerGameOver();
     }
 };
 
@@ -197,3 +221,7 @@ const updateHUD = () => {
     document.getElementById('garbage-wins').textContent = gameState.results.wins.garbage;
     document.getElementById('current-money').textContent = gameState.money;
 };
+
+const clearResultsHUD = () => {
+    document.getElementById('result-hud').innerHTML = '';
+}

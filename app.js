@@ -111,7 +111,6 @@ const placeBet = (type) => {
             gameState.results.losses[type]++; // update the loss
         }
 
-        
         updateResultDisplay(type, resultType, outcome);
         gameState.results.turns++;
         gameState.results.turnsHistory.push({
@@ -125,6 +124,7 @@ const placeBet = (type) => {
                 outcome: outcome
             }
         });
+        updateHUD();
     } else {
         alert('Not enough money to place this bet.');
     }
@@ -137,7 +137,7 @@ const addWinnings = (amount) => {
 
 // Function to update the Result Display
 const updateResultDisplay = (type, resultType, outcome) => {
-    const resultContainer = document.getElementById('result-display');
+    const resultContainer = document.getElementById('result-hud');
     resultContainer.innerHTML = ''; // Clear previous content
 
     // Create the bet image element
@@ -151,10 +151,49 @@ const updateResultDisplay = (type, resultType, outcome) => {
     resultImg.alt = resultType;
 
     // Create the overlay div
+    const overlay = document.createElement('div');
+    overlay.className = 'result-overlay';
+    overlay.style.backgroundColor = outcome === 'win' ? 'green' : 'red';
+    overlay.appendChild(betImg);
+    overlay.appendChild(resultImg);
 
     // Create the text elements
+    const betText = document.createElement('p');
+    betText.textContent = `Bet: ${type}`;
+
+    const resultText = document.createElement('p');
+    resultText.textContent = `Result: ${resultType}`;
+
+    const outcomeText = document.createElement('p');
+    outcomeText.textContent = outcome === 'win' ? 'You Won!' : 'You Lost!';
+
+    const betAmountText = document.createElement('p');
+    betAmountText.textContent = `Bet Amount: $${gameState.currentBet}`;
+
+    const winningsText = document.createElement('p');
+    winningsText.textContent = `Winnings Amount: $${outcome === 'win' ? gameState.currentBet * 2 : -gameState.currentBet}`;
+
+    const balanceText = document.createElement('p');
+    balanceText.textContent = `New Balance: $${gameState.money}`;
 
     // Append all elements to the result container
+    resultContainer.appendChild(overlay);
+    resultContainer.appendChild(betText);
+    resultContainer.appendChild(resultText);
+    resultContainer.appendChild(outcomeText);
+    resultContainer.appendChild(betAmountText);
+    resultContainer.appendChild(winningsText);
+    resultContainer.appendChild(balanceText);
 
-    console.log(type, resultType, outcome);
+    console.log(`Updated Display: ${type} - ${resultType} - ${outcome}`);
+};
+
+// Function to update the HUD
+const updateHUD = () => {
+    document.getElementById('turn-number').textContent = gameState.results.turns;
+    document.getElementById('games-played').textContent = gameState.games;
+    document.getElementById('resets').textContent = gameState.resets;
+    document.getElementById('carrot-wins').textContent = gameState.results.wins.carrots;
+    document.getElementById('garbage-wins').textContent = gameState.results.wins.garbage;
+    document.getElementById('current-money').textContent = gameState.money;
 };

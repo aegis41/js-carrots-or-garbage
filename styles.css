@@ -17,3 +17,71 @@ button {
     font-size: 18px;
     margin: 10px;
 }
+
+#result-display {
+    width: 600px;
+    margin: 20px auto;
+    text-align: center;
+    padding: 10px;
+    background-color: #F4F4F4;
+    border-radius: 8px;
+}
+
+.result-overlay img {
+    width: 33%;
+    height: 33%;
+    object-fit: contain;
+}
+
+.result-overlay {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+}
+
+p {
+    font-size: 18px;
+}
+
+#game-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    width: 80%;
+}
+
+#game-hud {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+#stat-hud {
+    flex: 1;
+    padding: 10px;
+    background-color: #EAEAEA;
+    border-radius: 8px;
+}
+
+#result-hud {
+    flex: 2;
+    padding: 10px;
+    background-color: #F4F4F4;
+    border-radius: 8px;
+}
+
+#game-hud p {
+    margin: 5px 0;
+}
+
+#bet-amounts {
+    margin-bottom: 20px;
+}
+
+#bet-carrots, #bet-garbage {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 18px;
+}

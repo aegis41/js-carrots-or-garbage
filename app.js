@@ -91,7 +91,7 @@ const triggerGameOver = () => {
     document.getElementById('final-garbage-wins').textContent = gameState.results.wins.garbage;
 
     //show the Game Over modal
-    document.getElementById('game-over-modal').style.display = 'block';
+    document.getElementById('game-over-modal').style.display = 'flex';
 };
 
 // Function to render the bet amount buttons from the gameState.betAmounts array

@@ -7,6 +7,22 @@
     #stat-hud, #result-hud {
         width: 100%; /* take up the full width */
     }
+
+    #bet-carrots, #bet-garbage {
+        width: 120px;
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    #bet-buttons {
+        justify-content: space-between;
+    }
+
+    #bet-amounts button {
+        width: 50px;
+        padding: 5px;
+        margin: 8px;
+    }
 }
 
 body {
@@ -99,10 +115,30 @@ p {
     margin-bottom: 20px;
 }
 
+#bet-amounts button {
+    margin: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    width: 60px;
+    background-color: #e6e6e6;
+    border-radius: 5px;
+
+}
+
+#bet-buttons {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin: 10px 0;
+}
+
 #bet-carrots, #bet-garbage {
-    margin: 10px;
-    padding: 10px 20px;
-    font-size: 18px;
+    padding: 10px 15px;
+    font-size: 16px;
+    width: 150px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    border: 2px solid #ccc;
 }
 
 .hud-label {

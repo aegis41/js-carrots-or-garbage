@@ -122,8 +122,6 @@ document.getElementById('clear-progress').addEventListener('click', clearGamePro
 
 // Function to start a new game
 const newGame = () => {
-    console.log(gameState);
-    let increment = gameState.results.turns === 0 ? 0 : 1;
     gameState = {
         money: 100,
         currentBet: 1,
@@ -144,7 +142,7 @@ const newGame = () => {
                 garbage: 0
             }
         },
-        games: gameState.games + increment,
+        games: gameState.games + 1,
         resets: gameState.resets
     };
 
@@ -183,13 +181,31 @@ const renderBetAmountButtons = () => {
     gameState.betAmounts.forEach(amount => {
         const button = document.createElement('button');
         button.textContent = `$${amount}`;
+
+        // Add the 'active' class to the current bet amount 
+        if (amount === gameState.currentBet) button.classList.add('active');
+
         button.addEventListener('click', () => {
             gameState.currentBet = amount;
+            updateActiveBetButton(button);
             console.log(`Bet amount set to: $${amount}`);
         });
         betButtonContainer.appendChild(button);
     });
     console.log('Bet buttons rendered', [gameState.betAmounts]);
+}
+
+const updateActiveBetButton = (selectedButton) => {
+    // Get all bet amount buttons
+    const buttons = document.querySelectorAll('#bet-amounts button');
+
+    // Remove the 'active' class from all buttons
+    buttons.forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // Add the active class to the selected button
+    selectedButton.classList.add('active');
 }
 
 // Function to place a bet

@@ -76,6 +76,7 @@ const loadGameState = () => {
 
 window.onload = () => {
     loadGameState();
+    updateHomeScreenButtons();
 };
 
 
@@ -104,6 +105,7 @@ document.getElementById('quit-game').addEventListener('click', () => {
     document.getElementById('game-screen').style.display = 'none';
     //show the home screen
     document.getElementById('home-screen').style.display = 'block';
+    updateHomeScreenButtons();
     console.log('Game quit, returning to home screen');
 });
 
@@ -115,8 +117,24 @@ document.getElementById('view-stats').addEventListener('click', () => {
 
 document.getElementById('back-to-home').addEventListener('click', () => {
     document.getElementById('stats-screen').style.display = 'none';
+    updateHomeScreenButtons();
     document.getElementById('home-screen').style.display = 'block';
-})
+});
+
+// BUTTON BEHAVIOR BLOCK
+const updateHomeScreenButtons = () => {
+    const savedGame = JSON.parse(localStorage.getItem('carrotsOrGarbageGameState'));
+
+    // disable start-game if you're not on at least turn 2
+    document.getElementById('start-game').disabled = gameState.results.turns <= 1;
+
+    // disable continue-game if no save game is found
+    document.getElementById('continue-game').disabled = !savedGame;
+
+    // disable clear progress if there is no progress to clear
+    document.getElementById('clear-progress').disabled = !savedGame;
+}
+
 
 // END OF BUTTON BLOCK //
 // ******************* //
@@ -169,9 +187,11 @@ const newGame = () => {
     console.log('Game screen displayed');
 
     // Render the bet buttons
+    saveGameState();
     renderBetAmountButtons();
     updateHUD();
     clearResultsHUD();
+    updateHomeScreenButtons();
 };
 
 const triggerGameOver = () => {

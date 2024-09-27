@@ -105,6 +105,17 @@ document.getElementById('quit-game').addEventListener('click', () => {
     //show the home screen
     document.getElementById('home-screen').style.display = 'block';
     console.log('Game quit, returning to home screen');
+});
+
+document.getElementById('view-stats').addEventListener('click', () => {
+    document.getElementById('stats-screen').style.display = 'block';
+    document.getElementById('home-screen').style.display = 'none';
+    populateStatistics();
+});
+
+document.getElementById('back-to-home').addEventListener('click', () => {
+    document.getElementById('stats-screen').style.display = 'none';
+    document.getElementById('home-screen').style.display = 'block';
 })
 
 // END OF BUTTON BLOCK //
@@ -322,4 +333,14 @@ const updateHUD = () => {
 
 const clearResultsHUD = () => {
     document.getElementById('result-hud').innerHTML = '';
-}
+};
+
+const populateStatistics = () => {
+    document.getElementById('stat-total-turns').textContent = gameState.results.turns;
+    document.getElementById('stat-total-games').textContent = gameState.games;
+    document.getElementById('stat-total-resets').textContent = gameState.resets;
+    document.getElementById('stat-carrot-wins').textContent = gameState.results.wins.carrots;
+    document.getElementById('stat-carrot-losses').textContent = gameState.results.losses.carrots;
+    document.getElementById('stat-garbage-wins').textContent = gameState.results.wins.garbage;
+    document.getElementById('stat-garbage-losses').textContent = gameState.results.losses.garbage;
+};

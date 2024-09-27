@@ -128,13 +128,25 @@ const updateHomeScreenButtons = () => {
     // disable start-game if you're not on at least turn 2
     document.getElementById('start-game').disabled = gameState.results.turns <= 1;
 
-    // disable continue-game if no save game is found
-    document.getElementById('continue-game').disabled = !savedGame;
+    // call function to update continue game button
+    updateContinueGameButton();
 
     // disable clear progress if there is no progress to clear
     document.getElementById('clear-progress').disabled = !savedGame;
 }
 
+const updateContinueGameButton = () => {
+    const savedGame = localStorage.getItem('carrotsOrGarbageGameState');
+    const continueGameButton = document.getElementById('continue-game');
+
+    if (savedGame) {
+        continueGameButton.disabled = false;
+        continueGameButton.innerHTML = `Continue Game<br><small>${getGameInfoText()}</small>`;
+    } else {
+        continueGameButton.disabled = true;
+        continueGameButton.innerHTML = 'Continue Game';
+    }
+};
 
 // END OF BUTTON BLOCK //
 // ******************* //
@@ -287,6 +299,16 @@ const checkGameOver = () => {
 const addWinnings = (amount) => {
     gameState.money += amount * 2;
 };
+
+const getGameInfoText = () => {
+    const savedGame = localStorage.getItem('carrotsOrGarbageGameState');
+    if (savedGame) {
+        const gameState = JSON.parse(savedGame);
+        return `R${gameState.resets}-G${gameState.games}-T${gameState.results.turns} | $${gameState.money}`;
+    }
+    return '';
+};
+
 
 // Function to update the Result Display
 const updateResultDisplay = (type, resultType, outcome) => {

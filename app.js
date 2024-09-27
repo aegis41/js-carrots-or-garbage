@@ -133,7 +133,7 @@ const updateHomeScreenButtons = () => {
     const savedGame = JSON.parse(localStorage.getItem('carrotsOrGarbageGameState'));
 
     // disable start-game if you're not on at least turn 2
-    document.getElementById('start-game').disabled = gameState.results.turns <= 1;
+    document.getElementById('start-game').disabled == gameState.results.turns;
 
     // call function to update continue game button
     updateContinueGameButton();

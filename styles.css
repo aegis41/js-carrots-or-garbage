@@ -55,6 +55,57 @@ button {
     border-radius: 5px;
 }
 
+/* General Button Styles */
+
+#home-screen button {
+    width: 200px;
+    padding: 10px 20px;
+    font-size: 18px;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+/* Start Game Button (orange for carrots) */
+#start-game {
+    background-color: #f93;
+    border-color: #f93;
+    color: white;
+}
+
+/* Continue Game Button */
+#continue-game {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+    color: white;
+}
+
+/* Clear Progress Button */
+#clear-progress {
+    background-color: #F44336;
+    border-color: #F44336;
+    color: white;
+}
+
+/* Disabled Button Styles */
+#home-screen button:disabled {
+    background-color: #ddd;
+    color: #888;
+    border-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Hover and click states */
+#home-screen button:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+#home-screen button:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+
 #result-display {
     width: 600px;
     margin: 20px auto;
@@ -156,7 +207,7 @@ p {
 #result-hud {
     flex: 2;
     padding: 10px;
-    background-color: #F4F4F4;
+    background-color: #ffd8b1;
     border-radius: 8px;
 }
 
@@ -202,9 +253,6 @@ p {
     border: 2px solid #ccc;
 }
 
-#control-buttons {
-
-}
 
 #quit-game {
     padding: 10px 20px;

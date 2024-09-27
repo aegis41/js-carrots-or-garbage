@@ -126,6 +126,12 @@ p {
 
 }
 
+#bet-amounts button.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
 #bet-buttons {
     display: flex;
     justify-content: space-around;

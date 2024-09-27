@@ -76,6 +76,7 @@ const loadGameState = () => {
 
 window.onload = () => {
     loadGameState();
+    updateHomeScreenButtons();
 };
 
 
@@ -104,6 +105,7 @@ document.getElementById('quit-game').addEventListener('click', () => {
     document.getElementById('game-screen').style.display = 'none';
     //show the home screen
     document.getElementById('home-screen').style.display = 'block';
+    updateHomeScreenButtons();
     console.log('Game quit, returning to home screen');
 });
 
@@ -115,8 +117,36 @@ document.getElementById('view-stats').addEventListener('click', () => {
 
 document.getElementById('back-to-home').addEventListener('click', () => {
     document.getElementById('stats-screen').style.display = 'none';
+    updateHomeScreenButtons();
     document.getElementById('home-screen').style.display = 'block';
-})
+});
+
+// BUTTON BEHAVIOR BLOCK
+const updateHomeScreenButtons = () => {
+    const savedGame = JSON.parse(localStorage.getItem('carrotsOrGarbageGameState'));
+
+    // disable start-game if you're not on at least turn 2
+    document.getElementById('start-game').disabled = gameState.results.turns <= 1;
+
+    // call function to update continue game button
+    updateContinueGameButton();
+
+    // disable clear progress if there is no progress to clear
+    document.getElementById('clear-progress').disabled = !savedGame;
+}
+
+const updateContinueGameButton = () => {
+    const savedGame = localStorage.getItem('carrotsOrGarbageGameState');
+    const continueGameButton = document.getElementById('continue-game');
+
+    if (savedGame) {
+        continueGameButton.disabled = false;
+        continueGameButton.innerHTML = `Continue Game<br><small>${getGameInfoText()}</small>`;
+    } else {
+        continueGameButton.disabled = true;
+        continueGameButton.innerHTML = 'Continue Game';
+    }
+};
 
 // END OF BUTTON BLOCK //
 // ******************* //
@@ -169,9 +199,11 @@ const newGame = () => {
     console.log('Game screen displayed');
 
     // Render the bet buttons
+    saveGameState();
     renderBetAmountButtons();
     updateHUD();
     clearResultsHUD();
+    updateHomeScreenButtons();
 };
 
 const triggerGameOver = () => {
@@ -267,6 +299,16 @@ const checkGameOver = () => {
 const addWinnings = (amount) => {
     gameState.money += amount * 2;
 };
+
+const getGameInfoText = () => {
+    const savedGame = localStorage.getItem('carrotsOrGarbageGameState');
+    if (savedGame) {
+        const gameState = JSON.parse(savedGame);
+        return `R${gameState.resets}-G${gameState.games}-T${gameState.results.turns} | $${gameState.money}`;
+    }
+    return '';
+};
+
 
 // Function to update the Result Display
 const updateResultDisplay = (type, resultType, outcome) => {

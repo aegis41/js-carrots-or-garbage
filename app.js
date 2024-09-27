@@ -62,6 +62,7 @@ const clearGameProgress = () => {
     //update the HUD to reflect the fresh game state
     gameState = newGameState;
     updateHUD();
+    updateContinueGameButton();
 
     // Show an alert confirming the progress reset
     const notification = document.getElementById('clear-progress-notification');
@@ -83,7 +84,7 @@ const loadGameState = () => {
 
 window.onload = () => {
     loadGameState();
-    updateHomeScreenButtons();
+    refreshUI();
 };
 
 
@@ -132,8 +133,11 @@ document.getElementById('back-to-home').addEventListener('click', () => {
 const updateHomeScreenButtons = () => {
     const savedGame = JSON.parse(localStorage.getItem('carrotsOrGarbageGameState'));
 
+    // is there a turn
+    let isTurn = 
+
     // disable start-game if you're not on at least turn 2
-    document.getElementById('start-game').disabled == gameState.results.turns;
+    document.getElementById('start-game').disabled = gameState.results.turns <= 1 && savedGame;
 
     // call function to update continue game button
     updateContinueGameButton();
@@ -141,6 +145,36 @@ const updateHomeScreenButtons = () => {
     // disable clear progress if there is no progress to clear
     document.getElementById('clear-progress').disabled = !savedGame;
 }
+
+const refreshUI = () => {
+    // check if there's a saved game to adjust button states
+    const savedGame = localStorage.getItem('carrotsOrGarbageGameState');
+
+    // update the home screen button states
+    updateHomeScreenButtons();
+
+    // show the correct screen based on the current state
+    if (gameState.money <=0) {
+        // If game is over, shot the game over modal
+        document.getElementById('game-over-modal').style.display = 'flex';
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('home-screen').style.display = 'none';
+    } else if (savedGame) {
+        // If there's a saved game, show the game screen
+        document.getElementById('game-screen').style.display = 'block';
+        document.getElementById('home-screen').style.display = 'none';
+    } else {
+        //otherwise, show the home screen
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('home-screen').style.display = 'block';
+    }
+
+    // update the HUD and buttons if on game screen
+    if (document.getElementById('game-screen').style.display === 'block') {
+        updateHUD();
+        renderBetAmountButtons();
+    }
+};
 
 const updateContinueGameButton = () => {
     const savedGame = localStorage.getItem('carrotsOrGarbageGameState');

@@ -61,7 +61,14 @@ const clearGameProgress = () => {
 
     //update the HUD to reflect the fresh game state
     gameState = newGameState;
-    updateHUD();    
+    updateHUD();
+
+    // Show an alert confirming the progress reset
+    const notification = document.getElementById('clear-progress-notification');
+    notification.style.display = 'block';
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
 };
 
 // Function to load the game state from local storage
@@ -126,7 +133,7 @@ const updateHomeScreenButtons = () => {
     const savedGame = JSON.parse(localStorage.getItem('carrotsOrGarbageGameState'));
 
     // disable start-game if you're not on at least turn 2
-    document.getElementById('start-game').disabled = gameState.results.turns <= 1;
+    document.getElementById('start-game').disabled == gameState.results.turns;
 
     // call function to update continue game button
     updateContinueGameButton();

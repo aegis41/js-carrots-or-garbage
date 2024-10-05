@@ -1,3 +1,38 @@
+const achivementList = [
+    {
+        key: 'bet_01',
+        name: 'Bet Once',
+        description: 'Place a single bet.',
+        criteria: {
+            value: 1,
+            attribute: 'results.turns',
+            operator: '>='
+        },
+        reward: {
+            attribute: 'money',
+            amount: 100,
+            operation: 'add'
+        },
+        completed: null
+    },
+    {
+        key: 'bet_02',
+        name: 'Bet Tence',
+        description: 'Place ten bets.',
+        criteria: {
+            value: 10,
+            attribute: 'results.turns',
+            operator: '>='
+        },
+        reward: {
+            attribute: 'money',
+            amount: 100,
+            operation: 'add'
+        },
+        completed: null
+    }
+];
+
 // Initialize game state
 let gameState = {
     money: 100,
@@ -20,7 +55,9 @@ let gameState = {
         }
     },
     games: 0, // games played this reset
-    resets: 0 // number of resets
+    resets: 0, // number of resets
+    // achivements list
+    achievements: achivementList
 };
 
 // Function to save game state to localStorage
@@ -52,7 +89,8 @@ const clearGameProgress = () => {
             }
         },
         games: gameState.games,
-        resets: gameState.resets + 1
+        resets: gameState.resets + 1,
+        achievements: gameState.achievements
     };
 
     // Save tthe new game state to local storage
@@ -225,7 +263,8 @@ const newGame = () => {
             }
         },
         games: gameState.games + 1,
-        resets: gameState.resets
+        resets: gameState.resets,
+        achievements: gameState.achievements
     };
 
     console.log('New game started', gameState);
@@ -322,6 +361,7 @@ const placeBet = (type) => {
                 outcome: outcome
             }
         });
+        checkAchievements();
         updateHUD();
         checkGameOver();
         saveGameState();
@@ -426,4 +466,79 @@ const populateStatistics = () => {
     document.getElementById('stat-carrot-losses').textContent = gameState.results.losses.carrots;
     document.getElementById('stat-garbage-wins').textContent = gameState.results.wins.garbage;
     document.getElementById('stat-garbage-losses').textContent = gameState.results.losses.garbage;
+};
+
+
+// ***** *********** *****
+// ***** ACHIVEMENTS *****
+// ***** *********** *****
+
+// Run through all incomplete Achivements to see if they're done.
+const checkAchievements = () => {
+    console.log(`Starting achivement check`, gameState.achievements);
+    gameState.achievements.forEach(achievement => {
+        if (!achievement.completed && evaluateCriteria(achievement.criteria)) {
+            markAsCompleted(achievement);
+            rewardPlayer(achievement);
+        }
+    });
+};
+
+// Evaluate criteria method (generic)
+const evaluateCriteria = (criteria) => {
+    const { value, attribute, operator } = criteria;
+    const attributeValue = attribute.split('.').reduce((obj, key) => obj[key], gameState);
+
+    switch (operator) {
+        case '>=': return attributeValue >= value;
+        case '<=': return attributeValue <= value;
+        case '==': return attributeValue == value;
+        default: throw new Error(`Unknown operator: ${operator}`);
+    }
+};
+
+// Reward player when achivement is completed
+const applyReward = (reward) => {
+    const { attribute, amount, operation } = reward;
+
+    // access the attribute in gameState dynamically
+    const attributeValue = attribute.split('.').reduce((obj, key) => obj[key], gameState);
+
+    // apply the reward operation
+    switch (operation) {
+        case 'add':
+            updateNestedAttribute(gameState, attribute, attributeValue + amount);
+            break;
+        case 'subtract':
+            updateNestedAttribute(gameState, attribute, attributeValue = amount);
+            break;
+        default:
+            throw new Error(`Unknown operation: ${operation}`);
+    }
+};
+
+const updateNestedAttribute = (obj, path, value) => {
+    const keys = path.split('.');
+    keys.reduce((obj, key, index) => {
+        if (index === keys.length - 1) {
+            obj[key] = value;
+        }
+        return obj[key];
+    }, obj);
+};
+
+const markAsCompleted = (achievement) => {
+    achievement.completed = new Date().toISOString(); // mark completion time
+};
+
+// Reward the player by applying all rewards
+const rewardPlayer = (achievement) => {
+    applyReward(achievement.reward);
+    console.log(`Player rewarded for completing ${achievement.name}`);
+};
+
+const clearAchievements = () => {
+    gameState.achievements.forEach(achievement => {
+        achievement.completed = null;
+    });
 };

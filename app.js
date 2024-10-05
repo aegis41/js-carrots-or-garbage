@@ -63,7 +63,6 @@ let gameState = {
 // Function to save game state to localStorage
 const saveGameState = () => {
     localStorage.setItem('carrotsOrGarbageGameState', JSON.stringify(gameState));
-    console.log('Game state saved', gameState);
 };
 
 // Function to clear saved game state from local storage.
@@ -93,9 +92,8 @@ const clearGameProgress = () => {
         achievements: gameState.achievements
     };
 
-    // Save tthe new game state to local storage
+    // Save the new game state to local storage
     localStorage.setItem('carrotsOrGarbageGameState', JSON.stringify(newGameState));
-    console.log('Game progress reset', newGameState);
 
     //update the HUD to reflect the fresh game state
     gameState = newGameState;
@@ -115,7 +113,6 @@ const loadGameState = () => {
     const savedState = localStorage.getItem('carrotsOrGarbageGameState');
     if (savedState) {
         gameState = JSON.parse(savedState);
-        console.log('Game state loaded:', gameState);
         updateHUD();
     }
 }
@@ -152,7 +149,6 @@ document.getElementById('quit-game').addEventListener('click', () => {
     //show the home screen
     document.getElementById('home-screen').style.display = 'block';
     updateHomeScreenButtons();
-    console.log('Game quit, returning to home screen');
 });
 
 document.getElementById('view-stats').addEventListener('click', () => {
@@ -267,16 +263,12 @@ const newGame = () => {
         achievements: gameState.achievements
     };
 
-    console.log('New game started', gameState);
-
     // Display game screen, etc.
     // Hide the home screen
     document.getElementById('home-screen').style.display = 'none';
-    console.log('Home screen hidden.');
 
     // Show the game screen
     document.getElementById('game-screen').style.display = 'block';
-    console.log('Game screen displayed');
 
     // Render the bet buttons
     saveGameState();
@@ -311,11 +303,9 @@ const renderBetAmountButtons = () => {
         button.addEventListener('click', () => {
             gameState.currentBet = amount;
             updateActiveBetButton(button);
-            console.log(`Bet amount set to: $${amount}`);
         });
         betButtonContainer.appendChild(button);
     });
-    console.log('Bet buttons rendered', [gameState.betAmounts]);
 }
 
 const updateActiveBetButton = (selectedButton) => {
@@ -335,7 +325,6 @@ const updateActiveBetButton = (selectedButton) => {
 const placeBet = (type) => {
     if (gameState.money >= gameState.currentBet) {
         gameState.money -= gameState.currentBet;
-        console.log(`Placed a bet ${type}, current money: $${gameState.money}`);
 
         // Determine win/loss and update the game state
         // TODO: Expand Updates
@@ -440,8 +429,6 @@ const updateResultDisplay = (type, resultType, outcome) => {
     resultContainer.appendChild(betAmountText);
     resultContainer.appendChild(winningsText);
     resultContainer.appendChild(balanceText);
-
-    console.log(`Updated Display: ${type} - ${resultType} - ${outcome}`);
 };
 
 // Function to update the HUD
@@ -475,7 +462,6 @@ const populateStatistics = () => {
 
 // Run through all incomplete Achivements to see if they're done.
 const checkAchievements = () => {
-    console.log(`Starting achivement check`, gameState.achievements);
     gameState.achievements.forEach(achievement => {
         if (!achievement.completed && evaluateCriteria(achievement.criteria)) {
             markAsCompleted(achievement);
@@ -534,7 +520,6 @@ const markAsCompleted = (achievement) => {
 // Reward the player by applying all rewards
 const rewardPlayer = (achievement) => {
     applyReward(achievement.reward);
-    console.log(`Player rewarded for completing ${achievement.name}`);
 };
 
 const clearAchievements = () => {
